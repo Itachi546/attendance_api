@@ -1,21 +1,15 @@
 let mysql = require('mysql');
 let express = require('express');
 
-//Name of database
-const databaseName = 'schema_attendance';
+let {databaseConfig} = require('../../config');
 
 class Database {
     constructor() {
-        this.pool = mysql.createPool({
-            host: 'localhost',
-            user: 'root',
-            password: '',
-            multipleStatements: true,
-            database: databaseName
-        });
 
+        this.pool = mysql.createPool(databaseConfig);
+        
         this.pool.getConnection((err, connection) => {
-            if(err) throw err;
+            if(err) next(err);
             this.createTable();
         });
     }

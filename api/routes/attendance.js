@@ -1,6 +1,3 @@
-/*
-* Asynchronous 
-*/
 let express = require('express');
 let db = require('./database')
 
@@ -67,6 +64,7 @@ function insertAttendance(body, students) {
     return q1 + q2.slice(0, -1);
 }
 
+//@TODO return status message in json reply
 function insertData(body, students) {
     db.query(insertSubject(body.SubjectId, body.Subject))
     .then(row => {
@@ -89,13 +87,15 @@ function insertData(body, students) {
     })
     .then(row => {
         console.log(row);
-        return row;
     })
     .catch(err => {
-            throw err
+          const errorString = err.code + ' ' + err.sqlMessage;
+          const error = new Error(errorString);
+          error.status = err.errno;
+          console.log(errorString);
     });
 }
-
+//@TODO return status message
 router.get('/', (req, res, next) => {
     res.status(400).json({
         message: 'Get Attendance Details'
@@ -106,8 +106,7 @@ router.post('/', (req, res, next) => {
     let body = req.body;
     let students = body.Students;
 
-    insertData(body, students);
-
+    const status = insertData(body, students, next);
     res.status(400).json({
         message: 'Post Attendance Details'
     });
