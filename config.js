@@ -1,5 +1,6 @@
 const express_config = {
-    port:process.env.PORT || 3000
+    //port:process.env.PORT || 3000
+    port:process.env.PORT || 3001
 };
 
 const databaseName = 'schema_attendance';
