@@ -48,9 +48,10 @@ app.use((req, res, next)=>{
 app.use((err, req, res, next)=>{
     res.status(err.status || 500);
     res.json({
-        error:{
-            message : err.message
-        }
+        code:400,
+        msg:err.code,
+        sqlMessage:err.sqlMessage
+
     });
 });
 

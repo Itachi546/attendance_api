@@ -21,13 +21,7 @@ router.get('/:classId/:instructorId?', (req, res, next)=>{
         );
         return rows;
     })
-    .catch(err=>{
-        res.status(400).json(
-            err
-        );
-        console.log(err);
-        return err;
-    })
+    .catch(next)
     
 });
 

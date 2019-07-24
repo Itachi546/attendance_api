@@ -7,9 +7,10 @@ class Database {
     constructor() {
 
         this.pool = mysql.createPool(databaseConfig);
-        
         this.pool.getConnection((err, connection) => {
-            if(err) next(err);
+            if(err){
+                throw(err);
+            }
             this.createTable();
         });
     }
