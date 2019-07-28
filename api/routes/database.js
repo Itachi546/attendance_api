@@ -51,7 +51,7 @@ class Database {
             Attendance table has a composite unique key
             (student_id, subject_code, attendance_date)
         */
-        sql = 'CREATE TABLE IF NOT EXISTS attendance (student_id varchar(16), subject_code varchar(16), class_id varchar(64), attendance_date date, instructor_id varchar(16), present char, UNIQUE KEY(student_id, attendance_date, subject_code, instructor_id))';
+        sql = 'CREATE TABLE IF NOT EXISTS attendance (student_id varchar(16), subject_code varchar(16), class_id varchar(64), attendance_date DATE, instructor_id varchar(16), present char, UNIQUE KEY(student_id, attendance_date, subject_code, instructor_id))';
         this.query(sql);
 
         sql =`ALTER TABLE attendance

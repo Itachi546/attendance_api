@@ -9,7 +9,7 @@ router.get('/:classId/:instructorId?', (req, res, next)=>{
     console.log(instructorId);
     let sql = `with cte as (SELECT DISTINCT subject_code,instructor_id from attendance where
          class_id ='${classId}' )
-         SELECT subject_code as subjectCode, subject.name, instructor.name as instructor from cte
+         SELECT subject_code as subjectCode, subject.name as subject, instructor.name as instructor from cte
          join subject on cte.subject_code= subject.code
          join instructor on cte.instructor_id = instructor.id`
     

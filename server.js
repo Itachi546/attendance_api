@@ -6,7 +6,7 @@ const {expressConfig} = require('./config');
 const server = http.createServer(app);
 const port = expressConfig.port;
 server.listen(port, ()=>{
-    console.log('Server stated at port 3000');
+    console.log('Server stated at port ', port);
 });
 
 

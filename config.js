@@ -8,7 +8,8 @@ const database_config = {
     host: 'localhost',
     user: 'root',
     password: '',
-    database: databaseName
+    database: databaseName,
+    dateStrings:true
 };
 
 module.exports.databaseConfig = database_config;
