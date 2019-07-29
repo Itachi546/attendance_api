@@ -2,16 +2,16 @@ let express = require('express');
 let db = require('./database')
 let router = express.Router();
 
-router.get('/:classId/:instructorId?', (req, res, next)=>{
-    const classId = req.params.classId;
-    let instructorId = req.params.instructorId;
-    instructorId = instructorId === 'all' ? '%' : instructorId;
-    console.log(instructorId);
-    let sql = `with cte as (SELECT DISTINCT subject_code,instructor_id from attendance where
-         class_id ='${classId}' )
-         SELECT subject_code as subjectCode, subject.name as subject, instructor.name as instructor from cte
-         join subject on cte.subject_code= subject.code
-         join instructor on cte.instructor_id = instructor.id`
+router.get('/:classId/:year/:part/', (req, res, next)=>{
+    const {classId, year, part} = req.params;
+    let sql = `SELECT subject.code as subjectCode,
+               subject.name as subject,
+               instructor.name as instructor
+               from 
+               (SELECT DISTINCT class_id, instructor_id, subject_code from attendance where class_id = "${classId}") as c 
+               join subject on c.subject_code = code
+               join instructor on instructor_id = instructor.id
+               where year = ${year} and part = ${part}`
     
     db.query(sql)
     .then(rows=>{
@@ -24,12 +24,5 @@ router.get('/:classId/:instructorId?', (req, res, next)=>{
     .catch(next)
     
 });
-
-router.post('/', (req, res, next)=>{
-    res.status(200).json({
-        message:'Post Subject Details'
-    });
-});
-
 
 module.exports = router;

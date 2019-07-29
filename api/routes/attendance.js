@@ -3,8 +3,8 @@ let db = require("./database");
 
 let router = express.Router();
 
-function insertSubject(code, name) {
-  let q1 = `INSERT IGNORE INTO subject (code, name) VALUES ("${code}", "${name}")`;
+function insertSubject(code, name, year, part) {
+  let q1 = `INSERT IGNORE INTO subject (code, name, year, part) VALUES ("${code}", "${name}", "${year}", "${part}")`;
   return q1;
 }
 
@@ -20,10 +20,12 @@ function insertStudent(students) {
   return `INSERT IGNORE INTO student (roll_no, name) VALUES ` + q1.slice(0, -1);
 }
 
+/*
 function insertClass(name, year, part) {
   let q1 = `INSERT IGNORE INTO class (name, year, part) VALUES ("${name}", "${year}", "${part}")`;
   return q1;
 }
+*/
 
 function insertAttendance(body, students) {
   let q1 = `INSERT INTO attendance (student_id, subject_code, class_id, attendance_date, instructor_id, present) VALUES `;
@@ -41,6 +43,7 @@ function insertAttendance(body, students) {
 router.get("/getRecent/:numData", (req, res, next) => {
   const numData = req.params.numData;
   let q1 = `SELECT class_id as class,
+            year,part,
         date,
         instructor.name as instructor,
         subject.name as subject,
@@ -72,12 +75,14 @@ router.get("/getAttendance/:classId/:subjectId/:date/", (req, res, next) => {
     .catch(next);
 });
 
+//@Todo Handling instructor with same instructorId and subjectCode
 router.get("/all/:classId/:subjectCode/:instructor", (req, res, next) => {
   const { classId, subjectCode, instructor } = req.params;
-  const sql = `SELECT rollNo, name, date, status 
+  const sql = `SELECT rollNo, name, date, status, present 
                  from (SELECT student_id as rollNo,
                  GROUP_CONCAT(attendance_date order by attendance_date) as date,
-                 GROUP_CONCAT(present order by attendance_date) as status
+                 GROUP_CONCAT(present order by attendance_date) as status,
+                 COUNT(CASE WHEN present='P' then 1 END) as present
                  from attendance where
                  class_id = "${classId}" and
                  subject_code ="${subjectCode}" and
@@ -92,16 +97,47 @@ router.get("/all/:classId/:subjectCode/:instructor", (req, res, next) => {
     .catch(next);
 });
 
+
+router.get("/getAttendance/:classId/:subjectId/:date/", (req, res, next) => {
+  const { subjectId, classId, date } = req.params;
+  const q1 = `SELECT rollNo, name, status from (SELECT student_id as rollNo, present as status from attendance where
+                    class_id ='${classId}' and
+                    subject_code='${subjectId}' and
+                    attendance_date ='${date}')
+                    as a join student where rollNo = student.roll_no order by rollNo`;
+
+  db.query(q1)
+    .then(row => {
+      res.status(200).json(row);
+    })
+    .catch(next);
+});
+
+router.get("/:subjectCode/:instructor", (req, res, next) => {
+  const {subjectCode, instructor} = req.params;
+  const sql = `SELECT attendance_date as "Attendance Date", COUNT(CASE WHEN present='P' then 1 END) as "Present Student", COUNT(attendance_date) as "Total Student" 
+                 from attendance where subject_code = "${subjectCode}"
+                 and instructor_id = (SELECT id from instructor where name ="${instructor}") group by attendance_date`;
+  db.query(sql)
+    .then(rows => {
+      res.status(200).json(rows);
+      return rows;
+    })
+    .catch(next);
+});
+
 router.post("/", (req, res, next) => {
   let body = req.body;
   let students = body.Students;
-  db.query(insertSubject(body.SubjectId, body.Subject))
+  db.query(insertSubject(body.SubjectId, body.Subject, body.Year, body.Part))
     .then(row => {
       return db.query(insertInstructor(body.InstructorId, body.Instructor));
     })
+    /*
     .then(row => {
       return db.query(insertClass(body.Class, body.Year, body.Part));
     })
+    */
     .then(row => {
       if (row.affectedRows !== 0) {
         return db.query(insertStudent(students));

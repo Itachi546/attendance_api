@@ -38,10 +38,12 @@ class Database {
         let sql = 'CREATE TABLE IF NOT EXISTS student (roll_no varchar(16), name varchar(64), email varchar(64), PRIMARY KEY(roll_no))';
         this.query(sql);
 
+        /*
         sql = 'CREATE TABLE IF NOT EXISTS class (name varchar(64), year INT, part INT, PRIMARY KEY(name))';
         this.query(sql);
+        */
 
-        sql = 'CREATE TABLE IF NOT EXISTS subject (code varchar(16), name varchar(64), PRIMARY KEY(code))';
+        sql = 'CREATE TABLE IF NOT EXISTS subject (code varchar(16), name varchar(64), year INT, part INT, PRIMARY KEY(code))';
         this.query(sql);
 
         sql = 'CREATE TABLE IF NOT EXISTS instructor (id varchar(64), name varchar(64), email varchar(64), PRIMARY KEY(id))';
@@ -57,7 +59,6 @@ class Database {
         sql =`ALTER TABLE attendance
                           ADD FOREIGN KEY(student_id) REFERENCES student(roll_no),
                           ADD FOREIGN KEY(subject_code) REFERENCES subject(code),
-                          ADD FOREIGN KEY(class_id) REFERENCES class(name),
                           ADD FOREIGN KEY(instructor_id) REFERENCES instructor(id)`;
     
         this.query(sql);

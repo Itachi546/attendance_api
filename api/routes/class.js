@@ -5,7 +5,7 @@ let router = express.Router();
 
 
 router.get('/', (req, res, next)=>{
-   let sql = 'SELECT DISTINCT * from class';
+   let sql = 'SELECT DISTINCT class_id as name, year, part from attendance join subject on subject_code = code';
    db.query(sql)
    .then(row=>{
        res.status(200).json(
