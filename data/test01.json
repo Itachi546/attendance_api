@@ -1,12 +1,12 @@
 {
-"InstructorId": "IS102",
+"InstructorId": "IS108",
 "Instructor" : "Michael Owen",
 "Date":"2019/2/16",
 "Class":"073BCX",
 "Year" : "3",
 "Part" : "2",
-"SubjectId":"CS102",
-"Subject":"DBMS",
+"SubjectId":"CS109",
+"Subject":"Artificial Intelligence",
 "Students" : [
     {
       "Roll": "073BCX501",

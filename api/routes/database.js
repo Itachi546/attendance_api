@@ -46,7 +46,7 @@ class Database {
         sql = 'CREATE TABLE IF NOT EXISTS subject (code varchar(16), name varchar(64), year INT, part INT, PRIMARY KEY(code))';
         this.query(sql);
 
-        sql = 'CREATE TABLE IF NOT EXISTS instructor (id varchar(64), name varchar(64), email varchar(64), PRIMARY KEY(id))';
+        sql = 'CREATE TABLE IF NOT EXISTS instructor (id varchar(64), name varchar(64), PRIMARY KEY(id))';
         this.query(sql);
 
         /*
