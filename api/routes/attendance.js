@@ -13,19 +13,18 @@ function insertInstructor(code, name) {
   return q1;
 }
 
-function insertStudent(students) {
+function insertStudent(students, class_id) {
   let q1 = students.reduce((accumulator, currentValue) => {
-    return accumulator + `("${currentValue.Roll}", "${currentValue.Name}"),`;
+    return accumulator + `("${currentValue.Roll}", "${currentValue.Name}", "${class_id}"),`;
   }, "");
-  return `INSERT IGNORE INTO student (roll_no, name) VALUES ` + q1.slice(0, -1);
+  return `INSERT IGNORE INTO student (roll_no, name, class_id) VALUES ` + q1.slice(0, -1);
 }
 
-/*
-function insertClass(name, year, part) {
-  let q1 = `INSERT IGNORE INTO class (name, year, part) VALUES ("${name}", "${year}", "${part}")`;
+
+function insertClass(class_id) {
+  let q1 = `INSERT IGNORE INTO class (id) VALUES ("${class_id}")`;
   return q1;
 }
-*/
 
 function insertAttendance(body, students) {
   let q1 = `INSERT INTO attendance (student_id, subject_code, class_id, attendance_date, instructor_id, present) VALUES `;
@@ -133,14 +132,12 @@ router.post("/", (req, res, next) => {
     .then(row => {
       return db.query(insertInstructor(body.InstructorId, body.Instructor));
     })
-    /*
     .then(row => {
-      return db.query(insertClass(body.Class, body.Year, body.Part));
+      return db.query(insertClass(body.Class));
     })
-    */
     .then(row => {
       if (row.affectedRows !== 0) {
-        return db.query(insertStudent(students));
+        return db.query(insertStudent(students, body.Class));
       }
     })
     .then(row => {

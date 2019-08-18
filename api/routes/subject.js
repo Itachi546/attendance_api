@@ -2,8 +2,8 @@ let express = require('express');
 let db = require('./database')
 let router = express.Router();
 
-router.get('/:classId/:year/:part/', (req, res, next)=>{
-    const {classId, year, part} = req.params;
+router.get('/:classId/:year/:part/', (req, res, next) => {
+    const { classId, year, part } = req.params;
     let sql = `SELECT subject.code as subjectCode,
                subject.name as subject,
                instructor.name as instructor
@@ -12,17 +12,39 @@ router.get('/:classId/:year/:part/', (req, res, next)=>{
                join subject on c.subject_code = code
                join instructor on instructor_id = instructor.id
                where year = ${year} and part = ${part}`
-    
+
     db.query(sql)
-    .then(rows=>{
-        console.log(rows);
-        res.status(200).json(
-            rows
-        );
-        return rows;
-    })
-    .catch(next)
-    
+        .then(rows => {
+            res.status(200).json(
+                rows
+            );
+            return rows;
+        })
+        .catch(next)
+
 });
+
+router.get('/single/:instructorId', (req, res, next) => {
+    const { instructorId } = req.params;
+    let sql = ` SELECT subject_code as subjectCode,
+              name as subject,
+              class_id as class,
+              year,
+              part from subject join 
+              (SELECT DISTINCT subject_code, class_id from attendance 
+                where instructor_id = "${instructorId}") as s on subject.code = subject_code`;
+
+    db.query(sql)
+        .then(rows => {
+            res.status(200).json(
+                rows
+            );
+            return rows;
+        })
+        .catch(next)
+
+});
+
+
 
 module.exports = router;

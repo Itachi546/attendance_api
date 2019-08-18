@@ -35,32 +35,42 @@ class Database {
     }
 
     createTable() {
-        let sql = 'CREATE TABLE IF NOT EXISTS student (roll_no varchar(16), name varchar(64), email varchar(64), PRIMARY KEY(roll_no))';
-        this.query(sql);
 
-        /*
-        sql = 'CREATE TABLE IF NOT EXISTS class (name varchar(64), year INT, part INT, PRIMARY KEY(name))';
-        this.query(sql);
-        */
+        /* Create Table */
+        let sql = 'CREATE TABLE IF NOT EXISTS subject (code varchar(16), name varchar(64), year INT, part INT, PRIMARY KEY(code))';
+        this.query(sql).then(()=>{
+            sql = 'CREATE TABLE IF NOT EXISTS instructor (id varchar(64), name varchar(64), PRIMARY KEY(id))';
+            return this.query(sql);
+        })
+        .then(()=>{
+            sql = 'CREATE TABLE IF NOT EXISTS class (id varchar(64), PRIMARY KEY(id))'
+            return this.query(sql);
+        })
+        .then(()=>{
+            sql = `CREATE TABLE IF NOT EXISTS student (roll_no varchar(16), name varchar(64), class_id varchar(64), PRIMARY KEY(roll_no),
+                        FOREIGN KEY(class_id) REFERENCES class(id))    
+            `;
+            return this.query(sql);
+        })
+        .then(()=>{
+            sql = 'CREATE TABLE IF NOT EXISTS attendance (student_id varchar(16), subject_code varchar(16), class_id varchar(64), attendance_date DATE, instructor_id varchar(16), present char, UNIQUE KEY(student_id, attendance_date, subject_code, instructor_id))';
+            return this.query(sql);
+        })
+        .catch(err=>{
+            console.log(err);
+        })
+    
+    
 
-        sql = 'CREATE TABLE IF NOT EXISTS subject (code varchar(16), name varchar(64), year INT, part INT, PRIMARY KEY(code))';
-        this.query(sql);
 
-        sql = 'CREATE TABLE IF NOT EXISTS instructor (id varchar(64), name varchar(64), PRIMARY KEY(id))';
-        this.query(sql);
 
-        /*
-            Attendance table has a composite unique key
-            (student_id, subject_code, attendance_date)
-        */
-        sql = 'CREATE TABLE IF NOT EXISTS attendance (student_id varchar(16), subject_code varchar(16), class_id varchar(64), attendance_date DATE, instructor_id varchar(16), present char, UNIQUE KEY(student_id, attendance_date, subject_code, instructor_id))';
-        this.query(sql);
 
         sql =`ALTER TABLE attendance
                           ADD FOREIGN KEY(student_id) REFERENCES student(roll_no),
                           ADD FOREIGN KEY(subject_code) REFERENCES subject(code),
-                          ADD FOREIGN KEY(instructor_id) REFERENCES instructor(id)`;
-    
+                          ADD FOREIGN KEY(instructor_id) REFERENCES instructor(id),
+                          ADD FOREIGN KEY(class_id) REFERENCES class(id)
+                          `;
         this.query(sql);
     }
 }

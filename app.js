@@ -9,6 +9,7 @@ const subjectRoute = require('./api/routes/subject');
 const instructorRoute = require('./api/routes/instructor');
 const attendanceRoute = require('./api/routes/attendance');
 const classRoute = require('./api/routes/class');
+const passwordRoute = require('./api/routes/password');
 
 //Debug setup
 app.use(morgan('dev'));
@@ -36,6 +37,7 @@ app.use('/class', classRoute);
 app.use('/attendance', attendanceRoute);
 app.use('/subject', subjectRoute);
 app.use('/instructor', instructorRoute);
+app.use('/password', passwordRoute);
 
 //Forward request to error handler
 app.use((req, res, next)=>{
