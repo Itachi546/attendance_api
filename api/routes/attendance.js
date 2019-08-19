@@ -128,17 +128,16 @@ router.get("/:subjectCode/:instructor", (req, res, next) => {
 router.post("/", (req, res, next) => {
   let body = req.body;
   let students = body.Students;
-  db.query(insertSubject(body.SubjectId, body.Subject, body.Year, body.Part))
+  console.log(body);
+  db.query(insertInstructor(body.InstructorId, body.Instructor))
     .then(row => {
-      return db.query(insertInstructor(body.InstructorId, body.Instructor));
+      return db.query(insertSubject(body.SubjectId, body.Subject, body.Year, body.Part));
     })
     .then(row => {
       return db.query(insertClass(body.Class));
     })
     .then(row => {
-      if (row.affectedRows !== 0) {
         return db.query(insertStudent(students, body.Class));
-      }
     })
     .then(row => {
       return db.query(insertAttendance(body, students));
