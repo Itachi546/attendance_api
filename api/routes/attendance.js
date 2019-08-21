@@ -128,7 +128,6 @@ router.get("/:subjectCode/:instructor", (req, res, next) => {
 router.post("/", (req, res, next) => {
   let body = req.body;
   let students = body.Students;
-  console.log(body);
   db.query(insertInstructor(body.InstructorId, body.Instructor))
     .then(row => {
       return db.query(insertSubject(body.SubjectId, body.Subject, body.Year, body.Part));
