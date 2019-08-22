@@ -32,7 +32,7 @@ function insertAttendance(body, students) {
     return (
       accumulator +
       `("${currentValue.Roll}", "${body.SubjectId}", "${body.Class}", "${
-        body.Date
+      body.Date
       }", "${body.InstructorId}", "${currentValue.Status}"),`
     );
   }, "");
@@ -113,7 +113,7 @@ router.get("/getAttendance/:classId/:subjectId/:date/", (req, res, next) => {
 });
 
 router.get("/:subjectCode/:instructor", (req, res, next) => {
-  const {subjectCode, instructor} = req.params;
+  const { subjectCode, instructor } = req.params;
   const sql = `SELECT attendance_date as "Attendance Date", COUNT(CASE WHEN present='P' then 1 END) as "Present Student", COUNT(attendance_date) as "Total Student" 
                  from attendance where subject_code = "${subjectCode}"
                  and instructor_id = (SELECT id from instructor where name ="${instructor}") group by attendance_date`;
@@ -128,15 +128,27 @@ router.get("/:subjectCode/:instructor", (req, res, next) => {
 router.post("/", (req, res, next) => {
   let body = req.body;
   let students = body.Students;
-  db.query(insertInstructor(body.InstructorId, body.Instructor))
-    .then(row => {
-      return db.query(insertSubject(body.SubjectId, body.Subject, body.Year, body.Part));
+  let password = body.Password;
+  db.query("SELECT value from authentication")
+    .then(res => {
+        passwordInDB = res[0].value;
+        if(passwordInDB !== password){
+          const error = new Error("Incorrect Password");
+          error.status = 400;
+          throw(error);
+        }
+    })
+    .then(() => {
+      db.query(insertInstructor(body.InstructorId, body.Instructor))
+        .then(row => {
+          return db.query(insertSubject(body.SubjectId, body.Subject, body.Year, body.Part));
+        })
     })
     .then(row => {
       return db.query(insertClass(body.Class));
     })
     .then(row => {
-        return db.query(insertStudent(students, body.Class));
+      return db.query(insertStudent(students, body.Class));
     })
     .then(row => {
       return db.query(insertAttendance(body, students));

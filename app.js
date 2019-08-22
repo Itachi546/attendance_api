@@ -48,12 +48,12 @@ app.use((req, res, next)=>{
 
 //Handling Error for all types
 app.use((err, req, res, next)=>{
-    console.log(err);
     res.status(err.status || 500);
     res.json({
         code:400,
         msg:err.code,
-        sqlMessage:err.sqlMessage
+        sqlMessage:err.sqlMessage,
+        message:err.message
 
     });
 });

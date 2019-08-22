@@ -44,6 +44,11 @@ class Database {
             return this.query(sql);
         })
             .then(() => {
+                console.log("Table Created for password");
+                sql = 'CREATE TABLE IF NOT EXISTS authentication (value varchar(255))';
+                return this.query(sql);
+            })
+            .then(() => {
                 console.log("Table Created: Instructor");
                 sql = 'CREATE TABLE IF NOT EXISTS class (id varchar(64), PRIMARY KEY(id))'
                 return this.query(sql);
@@ -51,8 +56,7 @@ class Database {
             .then(() => {
                 console.log("Table Created: Class");
                 sql = `CREATE TABLE IF NOT EXISTS student (roll_no varchar(16), name varchar(64), class_id varchar(64), PRIMARY KEY(roll_no),
-                        FOREIGN KEY(class_id) REFERENCES class(id))    
-            `;
+                        FOREIGN KEY(class_id) REFERENCES class(id))`;
                 return this.query(sql);
             })
             .then(() => {
