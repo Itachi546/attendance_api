@@ -48,10 +48,9 @@ router.get("/getRecent/:numData", (req, res, next) => {
         subject.name as subject,
         subject.code as subjectCode
         from
-       ( SELECT DISTINCT class_id, instructor_id, subject_code, attendance_date as date from attendance
-            order by attendance_date desc) as a 
+       ( SELECT DISTINCT class_id, instructor_id, subject_code, attendance_date as date from attendance) as a 
             join instructor on a.instructor_id = id 
-            join subject on a.subject_code = code limit ${numData}`;
+            join subject on a.subject_code = code order by date desc limit ${numData}`;
   db.query(q1)
     .then(row => {
       res.status(200).json(row);
@@ -129,9 +128,11 @@ router.post("/", (req, res, next) => {
   let body = req.body;
   let students = body.Students;
   let password = body.Password;
+  let passwordInDB = "";
   db.query("SELECT value from authentication")
     .then(res => {
-        passwordInDB = res[0].value;
+        if(res.length !== 0)
+          passwordInDB = res[0].value;
         if(passwordInDB !== password){
           const error = new Error("Incorrect Password");
           error.status = 400;
@@ -154,7 +155,7 @@ router.post("/", (req, res, next) => {
       return db.query(insertAttendance(body, students));
     })
     .then(row => {
-      res.status(400).json({
+      res.status(200).json({
         message: "Updated Successfully",
         code: 200
       });
